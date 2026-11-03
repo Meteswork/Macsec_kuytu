@@ -697,7 +697,7 @@ function cartItems(){return ALL.filter(i=>state.cart[i.id]).map(i=>({urun:i.name
 function cartTotal(){return cartItems().reduce((s,i)=>s+i.adet*i.fiyat,0)}
 
 // --- FAVORİ SİSTEMİ (GLOBAL) ---
-const DEFAULT_FAVS = ["i1", "h7", "i2"]; 
+const DEFAULT_FAVS = ["fm7", "s2", "i1", "i6", "b1", "b2", "b3", "b8", "b21"]; 
 
 function getFavs() {
   const stored = localStorage.getItem("user_favs");
@@ -1010,11 +1010,22 @@ $("#b-add").onclick=async()=>{
     });
   }catch(e){box.innerHTML="";box.appendChild(el("div","empty","Liste alınamadı: "+e.message))}
 };
-$("#nameForm").onsubmit=e=>{
+$("#nameForm").onsubmit = e => {
   e.preventDefault();
-  const ad=titleCase($("#ad").value), soyad=titleCase($("#soyad").value);
-  if(!ad||!soyad){$("#nameErr").textContent="Ad ve soyad zorunlu.";return}
-  state.ad=ad;state.soyad=soyad;openMenu();
+  const ad = titleCase($("#ad").value);
+  // Soyad boş bırakıldıysa otomatik olarak "-" ata, doluysa ilk harfini büyük yap
+  const soyadInput = $("#soyad").value.trim();
+  const soyad = soyadInput ? titleCase(soyadInput) : "-";
+
+  if (!ad) {
+    $("#nameErr").textContent = "Ad alanı zorunludur.";
+    return;
+  }
+  
+  $("#nameErr").textContent = "";
+  state.ad = ad;
+  state.soyad = soyad; 
+  openMenu();
 };
 function openMenu(){
   state.cart={}; renderMenu(); updateBar();
