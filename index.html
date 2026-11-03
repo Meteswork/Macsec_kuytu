@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Macsec | Sipariş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="macsec.png">
+<style>
+:root{
+  --bg:#050b1a; --card:rgba(14,30,66,.55); --line:rgba(70,140,255,.28);
+  --blue:#2f7bff; --cyan:#35d6ff; --text:#e6f0ff; --muted:#8aa3cf; --ok:#38f0a8; --err:#ff5d7a; --warn:#ffc857;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:'Rajdhani',system-ui,sans-serif; font-size:18px; color:var(--text);
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(47,123,255,.28), transparent 60%),
+    radial-gradient(800px 500px at 100% 10%, rgba(53,214,255,.16), transparent 60%),
+    var(--bg);
+  background-attachment:fixed; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px; opacity:.18;
+  mask-image:radial-gradient(ellipse at 50% 20%, #000 20%, transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 20%, #000 20%, transparent 75%);
+}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:28px 18px 130px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:26px;letter-spacing:.18em;
+  background:linear-gradient(90deg,var(--cyan),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 30px rgba(47,123,255,.5)}
+.logo small{display:block;font:500 11px 'Rajdhani';letter-spacing:.45em;color:var(--muted);-webkit-text-fill-color:var(--muted);margin-top:2px}
+.badge{font-size:13px;letter-spacing:.2em;color:var(--cyan);border:1px solid var(--line);padding:6px 12px;border-radius:99px;background:rgba(53,214,255,.07)}
+.badge i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:8px;box-shadow:0 0 10px var(--ok);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+
+h1,h2{font-family:'Orbitron',sans-serif;letter-spacing:.06em}
+h1{font-size:clamp(26px,5vw,44px);line-height:1.15;margin-bottom:10px}
+h1 span{color:var(--cyan);text-shadow:0 0 24px rgba(53,214,255,.55)}
+h2{font-size:22px;margin-bottom:6px}
+.sub{color:var(--muted);margin-bottom:28px;font-size:19px}
+
+.view{display:none;animation:in .45s ease}
+.view.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.glass{background:var(--card);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 20px 60px rgba(0,0,0,.35)}
+
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:10px}
+.choice{cursor:pointer;padding:34px 28px;text-align:left;color:var(--text);font:inherit;position:relative;overflow:hidden;
+  transition:.25s;border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.choice::after{content:"";position:absolute;inset:auto -20% -60% -20%;height:70%;background:radial-gradient(closest-side,rgba(47,123,255,.45),transparent);opacity:0;transition:.3s}
+.choice:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 0 36px rgba(47,123,255,.35)}
+.choice:hover::after{opacity:1}
+.choice .ico{font-size:34px;color:var(--cyan);margin-bottom:14px;text-shadow:0 0 18px var(--cyan)}
+.choice h3{font-family:'Orbitron';font-size:18px;letter-spacing:.08em;margin-bottom:8px;position:relative;z-index:1}
+.choice p{color:var(--muted);position:relative;z-index:1}
+
+.panel{padding:30px;max-width:520px}
+label{display:block;font-size:14px;letter-spacing:.2em;color:var(--muted);margin:16px 0 8px;text-transform:uppercase}
+input{width:100%;padding:14px 16px;font:600 19px 'Rajdhani';color:var(--text);background:rgba(5,11,26,.7);
+  border:1px solid var(--line);border-radius:12px;outline:none;transition:.2s}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(53,214,255,.15)}
+.btn{margin-top:22px;cursor:pointer;font:700 16px 'Orbitron';letter-spacing:.1em;color:#04112b;padding:15px 24px;border:0;border-radius:12px;
+  background:linear-gradient(90deg,var(--cyan),var(--blue));box-shadow:0 0 26px rgba(47,123,255,.5);transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(53,214,255,.6)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn.sm{margin:0;padding:10px 16px;font-size:13px}
+.back{background:none;border:0;color:var(--muted);font:600 16px 'Rajdhani';letter-spacing:.15em;cursor:pointer;margin-bottom:18px}
+.back:hover{color:var(--cyan)}
+.err{color:var(--err);min-height:22px;margin-top:12px;font-weight:600}
+
+.names{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.name-btn{padding:16px;text-align:left;cursor:pointer;color:var(--text);font:600 19px 'Rajdhani';border:1px solid var(--line);border-radius:14px;background:var(--card);transition:.2s}
+.name-btn:hover{border-color:var(--cyan);box-shadow:0 0 22px rgba(47,123,255,.35);transform:translateY(-2px)}
+.empty{color:var(--muted);padding:24px}
+
+.who{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);padding:8px 16px;border-radius:99px;background:rgba(47,123,255,.1);margin-bottom:24px}
+.who b{color:var(--cyan)}
+.cat{font-family:'Orbitron';font-size:15px;letter-spacing:.3em;color:var(--cyan);margin:30px 0 14px;display:flex;align-items:center;gap:14px}
+.cat::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.item{padding:16px 18px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:16px;background:var(--card);transition:.2s}
+.item.has{border-color:var(--cyan);box-shadow:0 0 24px rgba(53,214,255,.22)}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:20px}
+.item .t span{color:var(--muted);font-size:16px}
+.pr{font:700 14px 'Orbitron';color:var(--cyan);white-space:nowrap}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:38px;height:38px;border-radius:10px;cursor:pointer;font:700 22px 'Rajdhani';color:var(--text);border:1px solid var(--line);background:rgba(47,123,255,.15);transition:.15s}
+.qty button.plus{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04112b;border:0;box-shadow:0 0 14px rgba(47,123,255,.5)}
+.qty button:hover{transform:scale(1.08)}
+.qty em{min-width:26px;text-align:center;font:700 18px 'Orbitron';font-style:normal}
+.item .qty .minus,.item .qty em{visibility:hidden}
+.item.has .qty .minus,.item.has .qty em{visibility:visible}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;transform:translateY(120%);transition:.35s;padding:14px 18px}
+.bar.show{transform:none}
+.bar .in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--cyan);border-radius:16px;
+  background:rgba(8,18,44,.92);backdrop-filter:blur(14px);box-shadow:0 0 40px rgba(47,123,255,.45)}
+.bar .sum{flex:1;color:var(--muted);font-size:17px;line-height:1.3;min-width:0}
+.bar .sum b{color:var(--text);font-family:'Orbitron';letter-spacing:.06em}
+.bar .big{font:900 22px 'Orbitron';color:var(--cyan);text-shadow:0 0 18px rgba(53,214,255,.5);white-space:nowrap}
+.bar .btn{margin:0;padding:13px 20px}
+
+/* hesap */
+.person{padding:20px 22px;margin-bottom:18px}
+.p-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.p-head h3{font:700 19px 'Orbitron';letter-spacing:.06em;flex:1;min-width:140px}
+.p-head .sub-t{font:700 17px 'Orbitron';color:var(--cyan)}
+.line{display:grid;grid-template-columns:1fr auto auto 110px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px dashed rgba(70,140,255,.16)}
+.line:last-child{border-bottom:0}
+.line .nm b{display:block;font-size:20px}
+.line .nm small{color:var(--warn);font-size:15px}
+.line .up{color:var(--muted);white-space:nowrap}
+.line .lt{text-align:right;font:700 16px 'Orbitron'}
+.line.zero .nm b,.line.zero .lt{text-decoration:line-through;opacity:.45}
+.line .qty button{width:34px;height:34px;font-size:20px}
+@media(max-width:620px){
+  .line{grid-template-columns:1fr auto;grid-template-areas:"nm lt" "up qty"}
+  .line .nm{grid-area:nm}.line .lt{grid-area:lt}.line .up{grid-area:up}.line .qty{grid-area:qty;justify-self:end}
+  .bar .in{flex-wrap:wrap}.bar .btn{width:100%}
+}
+
+.done{text-align:center;padding:50px 20px}
+.done .check{width:84px;height:84px;margin:0 auto 22px;border-radius:50%;display:grid;place-items:center;font-size:42px;color:var(--ok);
+  border:2px solid var(--ok);box-shadow:0 0 40px rgba(56,240,168,.45)}
+.toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-160%);z-index:20;padding:12px 20px;border-radius:12px;background:rgba(8,18,44,.96);
+  border:1px solid var(--err);color:var(--err);font-weight:700;transition:.3s;max-width:92vw;text-align:center}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.show{transform:translate(-50%,0)}
+.demo{display:none;margin-top:30px;color:var(--muted);font-size:15px;text-align:center;border:1px dashed var(--line);padding:10px;border-radius:12px}
+
+.modal{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:rgba(2,6,16,.7);backdrop-filter:blur(6px);padding:18px}
+.modal.show{display:grid}
+.modal .box{max-width:440px;width:100%;padding:28px;text-align:center}
+.modal .box p{font-size:20px;margin-bottom:6px}
+.modal .row{display:flex;gap:12px;justify-content:center;margin-top:8px}
+.modal .row .btn{margin-top:14px}
+.fav-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: transform 0.2s ease;
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+}
+
+.fav-btn.active {
+  color: rgb(255, 0, 0);
+}
+@media(max-width:620px){
+  /* Mevcut line kodların duracak, altına şunları ekle: */
+  .item { flex-wrap: wrap; }
+  .item .t { min-width: 100%; margin-bottom: 6px; }
+  .item .pr { flex: 1; text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">MACSEC<small>RESTORAN SİPARİŞ SİSTEMİ</small></div>
+    <div class="badge"><i></i>ÇEVRİMİÇİ</div>
+  </header>
+
+  <!-- ANA EKRAN -->
+  <section class="view active" id="v-home">
+    <h1>Siparişini <span>şimdi</span> ver.</h1>
+    <p class="sub">Yeni sipariş oluştur, mevcut siparişe ekle ya da hesabı öde.</p>
+    <div class="choices">
+      <button class="choice" id="b-create"><div class="ico">✦</div><h3>SİPARİŞ OLUŞTUR</h3><p>Adını gir, menüden seç, siparişin hazırlansın.</p></button>
+      <button class="choice" id="b-add"><div class="ico">＋</div><h3>SİPARİŞ EKLE</h3><p>Adını seç ve mevcut siparişine ekleme yap.</p></button>
+      <button class="choice" id="b-bill"><div class="ico">₺</div><h3>HESAP / ÖDEME</h3><p>Açık hesapları gör, adetleri düzelt ve öde.</p></button>
+    </div>
+    <div class="demo" id="demoNote">DEMO MODU — Google Tablolar bağlantısı henüz yapılmadı, veriler yalnızca bu tarayıcıda saklanır.</div>
+  </section>
+
+  <!-- İSİM GİRİŞİ -->
+  <section class="view" id="v-name">
+    <button class="back" data-go="home">← GERİ</button>
+    <h2>SİPARİŞ OLUŞTUR</h2>
+    <p class="sub">Önce seni tanıyalım.</p>
+    <form class="glass panel" id="nameForm" autocomplete="off">
+      <label for="ad">Ad</label><input id="ad" required maxlength="40">
+      <label for="soyad">Soyad</label><input id="soyad" required maxlength="40">
+      <div class="err" id="nameErr"></div>
+      <button class="btn" type="submit">MENÜYE GEÇ →</button>
+    </form>
+  </section>
+
+  <!-- İSİM SEÇİMİ -->
+  <section class="view" id="v-pick">
+    <button class="back" data-go="home">← GERİ</button>
+    <h2>SİPARİŞ EKLE</h2>
+    <p class="sub">Adını listeden seç.</p>
+    <div class="names" id="names"></div>
+  </section>
+
+  <!-- MENÜ -->
+  <section class="view" id="v-menu">
+    <button class="back" id="menuBack">← GERİ</button>
+    <div class="who">SİPARİŞ SAHİBİ: <b id="whoName"></b><span id="whoTag"></span></div>
+    
+    <!-- ÖZEL ÜRÜN EKLEME ALANI -->
+    <div class="glass" style="padding: 16px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <b style="color: var(--warn); width: 100%; margin-bottom: 4px; font-size: 15px; letter-spacing: 0.1em;">+ MENÜ DIŞI ÜRÜN</b>
+      <input type="text" id="customName" placeholder="Ürün Adı" style="flex: 2; min-width: 150px; padding: 10px; font-size: 16px;">
+      <input type="number" id="customPrice" placeholder="Fiyat (₺)" style="flex: 1; min-width: 80px; padding: 10px; font-size: 16px;">
+      <button class="btn sm" id="addCustomBtn" style="margin: 0; padding: 10px 18px;">EKLE</button>
+    </div>
+
+    <div id="menu"></div>
+  </section>
+
+  <!-- HESAP -->
+  <section class="view" id="v-bill">
+    <button class="back" data-go="home">← GERİ</button>
+    <h2>HESAP / ÖDEME</h2>
+    <p class="sub">Adetleri + / − ile düzeltebilirsin; tutar anında güncellenir.</p>
+    <div id="billBox"></div>
+  </section>
+
+  <!-- TAMAMLANDI -->
+  <section class="view" id="v-done">
+    <div class="glass done">
+      <div class="check">✓</div>
+      <h2>SİPARİŞİN ALINDI</h2>
+      <p class="sub" id="doneText"></p>
+      <button class="btn" data-go="home">ANA SAYFA</button>
+    </div>
+  </section>
+</div>
+
+<div class="bar" id="bar"><div class="in">
+  <div class="sum" id="sum"></div>
+  <div class="big" id="cartTotal"></div>
+  <button class="btn" id="send">SİPARİŞİ GÖNDER</button>
+</div></div>
+
+<div class="bar" id="billBar"><div class="in">
+  <div class="sum"><b>GENEL TOPLAM</b></div>
+  <div class="big" id="grand"></div>
+  <button class="btn" id="payAll">TÜM HESABI ÖDE</button>
+</div></div>
+
+<div class="modal" id="modal"><div class="glass box">
+  <p id="modalText"></p>
+  <div class="row">
+    <button class="btn ghost sm" id="mNo">VAZGEÇ</button>
+    <button class="btn sm" id="mYes">ÖDENDİ</button>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ AYARLAR ============ */
+// Google Apps Script web uygulaması URL'sini buraya yapıştır (…/exec ile biten adres).
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygdd2IQZxm0Tc0FTzNQIlOFckxiiWQymyiSRgg3-YFXynyUilSoL5RdTC5pXa3LZvTlA/exec";
+
+// Menü ve fiyatlar: buradan düzenle (price = TL).
+const MENU = [
+  { cat: "Fırsat Menüleri", items: [
+    { id: "fm1", name: "2`Lİ BİRALI KOKTEYL", desc: "", price: 400 },
+    { id: "fm2", name: "2 KUZU KULAĞI", desc: "", price: 800 },
+    { id: "fm3", name: "FİSH AND CİPS + TUBORG 33", desc: "", price: 550 },
+    { id: "fm4", name: "BİRA TABAĞI + TUBORG 50 CL", desc: "", price: 550 },
+    { id: "fm5", name: "BİRA + HAMBURGER", desc: "", price: 650 },
+    { id: "fm6", name: "BEER N DEER", desc: "", price: 350 },
+    { id: "fm7", name: "5LI TEKILA", desc: "", price: 450 },
+    { id: "fm8", name: "2 TANE IRISH CAR BOMB", desc: "", price: 600 },
+    { id: "fm9", name: "5LI JAGERMEISTER", desc: "", price: 600 },
+    { id: "fm10", name: "5LI SMIRNOFF NORTH", desc: "", price: 480 },
+    { id: "fm11", name: "5LI SIERRA TROPICAL", desc: "", price: 440 },
+    { id: "fm12", name: "5LI SHANKYS WHIP", desc: "", price: 550 },
+    { id: "fm13", name: "5`Lİ SINGLETON 12 yrs", desc: "", price: 550 },
+    { id: "fm14", name: "BLACK LABEL 5LI", desc: "", price: 650 },
+    { id: "fm15", name: "5`Lİ WHYTE MACKAY", desc: "", price: 420 },
+    { id: "fm16", name: "5` Lİ OLD SMUGGLER", desc: "", price: 320 },
+    { id: "fm17", name: "5`Lİ HARE MUZ LİKÖRÜ", desc: "", price: 320 },
+    { id: "fm18", name: "5`Lİ HARE VİŞNE LİKÖRÜ", desc: "", price: 320 },
+    { id: "fm19", name: "5`Lİ HARE HİNDİSTAN CEVİZİ LİKÖRÜ", desc: "", price: 320 },
+    { id: "fm20", name: "5`Lİ HARE ACIBADEM LİKÖRÜ", desc: "", price: 320 },
+    { id: "fm21", name: "5`Lİ HARE 41 BAHARAT LİKÖRÜ", desc: "", price: 320 }
+  ]},
+  { cat: "Yemekler & Dürümler & Burgerler", items: [
+    { id: "y1", name: "Tavuklu Sezar Salatası", desc: "", price: 400 },
+    { id: "y2", name: "ETLİ QUESADIILA", desc: "", price: 415 },
+    { id: "y3", name: "ÇITIR TAVK BURGER", desc: "", price: 450 },
+    { id: "y4", name: "TAVUKLU QUESADILLA", desc: "", price: 360 },
+    { id: "y5", name: "SEBZELİ QUESADIILA", desc: "", price: 360 },
+    { id: "y6", name: "ET DÜRÜM", desc: "", price: 475 },
+    { id: "y7", name: "KÖFTE DÜRÜM", desc: "", price: 450 },
+    { id: "y8", name: "TAVUKLU DÜRÜM", desc: "", price: 360 },
+    { id: "y9", name: "SEBZELİ DÜRÜM", desc: "", price: 360 },
+    { id: "y10", name: "CHİCKEN BURGER", desc: "", price: 450 },
+    { id: "y11", name: "KUYTU CHEESEBURGER", desc: "", price: 550 },
+    { id: "y12", name: "KUYTU HAMBURGER", desc: "", price: 540 },
+    { id: "y13", name: "IZGARA KÖFTE", desc: "", price: 550 },
+    { id: "y14", name: "PENNE ARABIATA", desc: "", price: 480 },
+    { id: "y15", name: "BOLONEZ SPAGETTİ", desc: "", price: 510 },
+    { id: "y16", name: "KÖRİ SOSLU TAVUK", desc: "", price: 530 },
+    { id: "y17", name: "NAPOLITEN SPAGETTİ", desc: "", price: 480 },
+    { id: "y18", name: "IZGARA TAVUK GÖĞÜS", desc: "", price: 540 },
+    { id: "y19", name: "FETTUCCINE ALFREDO", desc: "", price: 495 },
+    { id: "y20", name: "Şinitzel", desc: "", price: 400 },
+    { id: "y21", name: "TONBALIKLI SALATA", desc: "", price: 400 },
+    { id: "y22", name: "MEXİCA BURGER", desc: "", price: 550 },
+    { id: "y23", name: "SPANİSH BURGER", desc: "", price: 550 },
+    { id: "y24", name: "DANA BACON BURGER", desc: "", price: 550 }
+  ]},
+  { cat: "Atıştırmalıklar", items: [
+    { id: "a1", name: "KUYTU MİX", desc: "", price: 750 },
+    { id: "a2", name: "BİRA TABAĞI", desc: "", price: 440 },
+    { id: "a3", name: "ELMA DİLİM PATATES KIZARTMASI", desc: "", price: 300 },
+    { id: "a4", name: "FİSH AND CİPS", desc: "", price: 540 },
+    { id: "a5", name: "FALAFEL", desc: "", price: 300 },
+    { id: "a6", name: "SOSİS TABAĞI", desc: "", price: 300 },
+    { id: "a7", name: "ÇITIR TAVUK TABAĞI", desc: "", price: 400 },
+    { id: "a8", name: "SİGARA BÖREĞİ", desc: "", price: 300 },
+    { id: "a9", name: "MOZERALLA STICKS", desc: "", price: 300 },
+    { id: "a10", name: "SOĞAN HALKASI", desc: "", price: 300 },
+    { id: "a11", name: "PATATES KIZARTMASI", desc: "", price: 295 },
+    { id: "a12", name: "TURŞU TABAĞI", desc: "", price: 175 },
+    { id: "a13", name: "DORİTOS", desc: "", price: 125 },
+    { id: "a14", name: "RUFFLES KLASİK", desc: "", price: 125 },
+    { id: "a15", name: "TUZLU FISTIK", desc: "", price: 125 }
+  ]},
+  { cat: "Kokteyller", items: [
+    { id: "k1", name: "ROUGE", desc: "", price: 450 },
+    { id: "k2", name: "HİBİSCUS PİNK", desc: "", price: 450 },
+    { id: "k3", name: "PASSİON FINDIK", desc: "", price: 450 },
+    { id: "k4", name: "GREATNESS T-N", desc: "", price: 500 },
+    { id: "k5", name: "BALKABAĞI OLD FASHİON", desc: "", price: 475 },
+    { id: "k6", name: "AHU-DUTU", desc: "", price: 450 },
+    { id: "k7", name: "KUZU KULAĞI SOUR", desc: "", price: 450 },
+    { id: "k8", name: "2 TANE IRISH CARBOMB", desc: "", price: 600 },
+    { id: "k9", name: "KUYTUDAYIZ", desc: "", price: 450 },
+    { id: "k10", name: "MAHALLE BARI", desc: "", price: 450 },
+    { id: "k11", name: "KUYTUDA BULUSALIM", desc: "", price: 450 },
+    { id: "k12", name: "MEKANCILARIN MEKANI", desc: "", price: 450 },
+    { id: "k13", name: "LONG ISLAND", desc: "", price: 450 },
+    { id: "k14", name: "GIN FIZZ", desc: "", price: 350 },
+    { id: "k15", name: "OLD FASHIONED", desc: "", price: 450 },
+    { id: "k16", name: "APEROL SPRITZ", desc: "", price: 450 },
+    { id: "k17", name: "MARGARITA", desc: "", price: 430 },
+    { id: "k18", name: "JAGERBOMB", desc: "", price: 385 },
+    { id: "k19", name: "CUBA LIBRE", desc: "", price: 430 },
+    { id: "k20", name: "GIN SOUR", desc: "", price: 430 },
+    { id: "k21", name: "WHISKEY SOUR", desc: "", price: 450 },
+    { id: "k22", name: "LYNCHBURG LEMONADE", desc: "", price: 450 },
+    { id: "k23", name: "BLACK RUSSIAN", desc: "", price: 430 },
+    { id: "k24", name: "WHITE RUSSIAN", desc: "", price: 430 },
+    { id: "k25", name: "NEGRONI", desc: "", price: 450 },
+    { id: "k26", name: "ESPRESSO MARTINI", desc: "", price: 450 },
+    { id: "k27", name: "DIRTY MARTINI", desc: "", price: 430 },
+    { id: "k28", name: "Dry (Gin) Martini", desc: "", price: 430 }
+  ]},
+  { cat: "Tek Çekim / Shot", items: [
+    { id: "s1", name: "JAMESON SHOT", desc: "", price: 140 },
+    { id: "s2", name: "TEKILA", desc: "", price: 125 },
+    { id: "s3", name: "JAGERMEISTER", desc: "", price: 175 },
+    { id: "s4", name: "SMIRNOFF NORTH", desc: "", price: 120 },
+    { id: "s5", name: "SIERRA TROPICAL", desc: "", price: 125 },
+    { id: "s6", name: "SHANKYS WHIP", desc: "", price: 150 },
+    { id: "s7", name: "BLACK LABEL", desc: "", price: 160 },
+    { id: "s8", name: "DOUBLE BLACK", desc: "", price: 400 },
+    { id: "s9", name: "GOLD LABEL", desc: "", price: 400 },
+    { id: "s10", name: "BAILEYS", desc: "", price: 150 },
+    { id: "s11", name: "JIM BEAM HONEY", desc: "", price: 165 },
+    { id: "s12", name: "JIM BEAM APPLE", desc: "", price: 165 },
+    { id: "s13", name: "JIM BEAM RED STAG", desc: "", price: 165 },
+    { id: "s14", name: "SINGLETON", desc: "", price: 150 },
+    { id: "s15", name: "DIMPLE", desc: "", price: 200 },
+    { id: "s16", name: "TALISKER", desc: "", price: 450 },
+    { id: "s17", name: "WHYTE MACKAY", desc: "", price: 135 },
+    { id: "s18", name: "PASSOA", desc: "", price: 165 },
+    { id: "s19", name: "CHAMBORD", desc: "", price: 225 },
+    { id: "s20", name: "SAFARI", desc: "", price: 200 },
+    { id: "s21", name: "KAHLUA", desc: "", price: 200 },
+    { id: "s22", name: "GORDONS", desc: "", price: 150 },
+    { id: "s23", name: "GORDON’S PINK", desc: "", price: 165 },
+    { id: "s24", name: "GORDONS LIME", desc: "", price: 165 },
+    { id: "s25", name: "SMIRNOFF", desc: "", price: 150 },
+    { id: "s26", name: "TRIPLE SEC", desc: "", price: 200 },
+    { id: "s27", name: "JAGERMAISTER COLD BREW", desc: "", price: 200 },
+    { id: "s28", name: "JAGERMAISTER MANIFEST", desc: "", price: 200 },
+    { id: "s29", name: "SENOR TEKILA", desc: "", price: 155 },
+    { id: "s30", name: "PUSCHKIN NUTS & NOUGAT", desc: "", price: 100 },
+    { id: "s31", name: "PUSCHKIN BLACK BERRIES", desc: "", price: 100 },
+    { id: "s32", name: "PUSCHKIN BLUEBERRYS", desc: "", price: 100 },
+    { id: "s33", name: "PUSCHKIN PASSION FRUIT & YUZU", desc: "", price: 100 },
+    { id: "s34", name: "HENDRICK`S", desc: "", price: 275 },
+    { id: "s35", name: "ROYAL BISON", desc: "", price: 310 },
+    { id: "s36", name: "DEWAR`S WHİTE LABEL", desc: "", price: 200 },
+    { id: "s37", name: "BULLEIT BOURBON", desc: "", price: 200 },
+    { id: "s38", name: "HYDE NO:3", desc: "", price: 300 },
+    { id: "s39", name: "HYDE NO:5", desc: "", price: 300 },
+    { id: "s40", name: "HYDE NO:8", desc: "", price: 300 },
+    { id: "s41", name: "CARDHU 12yrs", desc: "", price: 300 },
+    { id: "s42", name: "HİBİKİ", desc: "", price: 950 },
+    { id: "s43", name: "KETEL ONE", desc: "", price: 350 },
+    { id: "s44", name: "BELVEDERE", desc: "", price: 350 },
+    { id: "s45", name: "CARDHU 15", desc: "", price: 500 },
+    { id: "s46", name: "TANQERAY DRY", desc: "", price: 220 },
+    { id: "s47", name: "TANQUERAY NO 10", desc: "", price: 235 },
+    { id: "s48", name: "TANQUERAY SEVILLA", desc: "", price: 225 },
+    { id: "s49", name: "BOMBAY SAPHIRE", desc: "", price: 250 },
+    { id: "s50", name: "KNUT HANSEN", desc: "", price: 300 },
+    { id: "s51", name: "GREEN BABOON", desc: "", price: 300 },
+    { id: "s52", name: "GLENKICHIE 12yrs.", desc: "", price: 375 },
+    { id: "s53", name: "LAGAVULIN 8. yrs", desc: "", price: 400 },
+    { id: "s54", name: "ROKU", desc: "", price: 250 },
+    { id: "s55", name: "AUCHENTOSAN", desc: "", price: 200 },
+    { id: "s56", name: "APEROL", desc: "", price: 200 },
+    { id: "s57", name: "CAMPARİ", desc: "", price: 200 },
+    { id: "s58", name: "CAP. MORGAN WHITE", desc: "", price: 200 },
+    { id: "s59", name: "CAP. MORGAN SPICE", desc: "", price: 200 },
+    { id: "s60", name: "BACARDI", desc: "", price: 200 },
+    { id: "s61", name: "JW BLACK RUBY", desc: "", price: 200 },
+    { id: "s62", name: "MEZCAL JAGUAR", desc: "", price: 300 },
+    { id: "s63", name: "MEZCAL ORİGEN", desc: "", price: 300 },
+    { id: "s64", name: "HERENCIA SİLVER", desc: "", price: 210 },
+    { id: "s65", name: "HERENCİA REPESADO", desc: "", price: 250 },
+    { id: "s66", name: "HERENCİA ANEJO", desc: "", price: 250 },
+    { id: "s67", name: "HERENCİA COFFE", desc: "", price: 200 },
+    { id: "s68", name: "PUSCHKIN KARAMEL", desc: "", price: 100 },
+    { id: "s69", name: "PUSCHKIN ICE MİNT", desc: "", price: 100 },
+    { id: "s70", name: "PUSCHKIN WATERMELON", desc: "", price: 100 },
+    { id: "s71", name: "VİSKİ SAFARİ", desc: "", price: 135 },
+    { id: "s72", name: "JAGER ORANGE", desc: "", price: 165 },
+    { id: "s73", name: "JİM BEAM", desc: "", price: 130 },
+    { id: "s74", name: "HARE ACIBADEM LİKÖRÜ", desc: "", price: 100 },
+    { id: "s75", name: "HARE HİNDİSTAN CEVİZİ LİKÖRÜ", desc: "", price: 100 },
+    { id: "s76", name: "HARE MUZ LİÖRÜ", desc: "", price: 100 },
+    { id: "s77", name: "HARE VİŞNE LİKÖRÜ", desc: "", price: 100 },
+    { id: "s78", name: "HARE 41 BAHARAT LİKÖRÜ", desc: "", price: 100 }
+  ]},
+  { cat: "Setler / 5'li Shotlar", items: [
+    { id: "st1", name: "5`Lİ JAMESON", desc: "", price: 550 },
+    { id: "st2", name: "ESPRESSO MARTİNİ SHOT", desc: "", price: 450 },
+    { id: "st3", name: "5`Lİ PUSCHKIN ICE MİNT", desc: "", price: 350 },
+    { id: "st4", name: "5`Lİ PUSCHKIN PASSION", desc: "", price: 350 },
+    { id: "st5", name: "5`Lİ PUSCHKIN NUTS", desc: "", price: 350 },
+    { id: "st6", name: "5`Lİ PUSCHKIN BLUE", desc: "", price: 350 },
+    { id: "st7", name: "5`Lİ PUSCHKIN WATERMELON", desc: "", price: 350 },
+    { id: "st8", name: "5Lİ PUSCHKIN BLACK", desc: "", price: 350 },
+    { id: "st9", name: "5`Lİ PUSCHKIN KARAMEL", desc: "", price: 350 },
+    { id: "st10", name: "5`Lİ ORANGE JAGER", desc: "", price: 600 },
+    { id: "st11", name: "TEKILA 5LI", desc: "", price: 450 },
+    { id: "st12", name: "SMIRNOFF NORTH 5LI", desc: "", price: 480 },
+    { id: "st13", name: "JAGERMEISTER 5LI", desc: "", price: 600 },
+    { id: "st14", name: "SHANKYS 5LI", desc: "", price: 550 },
+    { id: "st15", name: "SIERRA TROPICAL 5LI", desc: "", price: 440 },
+    { id: "st16", name: "SINGLETON 5`Lİ", desc: "", price: 550 },
+    { id: "st17", name: "5`Lİ BLACKLABEL", desc: "", price: 650 },
+    { id: "st18", name: "5`Lİ SCHWARTZHOG", desc: "", price: 550 },
+    { id: "st19", name: "5`Lİ JİM BEAM HONEY", desc: "", price: 350 },
+    { id: "st20", name: "5`Lİ JİM BEAM APPLE", desc: "", price: 350 },
+    { id: "st21", name: "5`Lİ WHYTE&MACKAY", desc: "", price: 420 },
+    { id: "st22", name: "5`Lİ YOĞURT LİKÖRÜ", desc: "", price: 400 },
+    { id: "st23", name: "5`Lİ VİSKİ SAFARİ", desc: "", price: 400 },
+    { id: "st24", name: "5`Lİ JİM BEAM", desc: "", price: 500 }
+  ]},
+  { cat: "Şaraplar", items: [
+    { id: "sr1", name: "BEŞİBİRYERDE KADEH BLUSH", desc: "", price: 250 },
+    { id: "sr2", name: "BEŞİBİRYERDE BLUSH ŞİŞE 75 CL", desc: "", price: 650 },
+    { id: "sr3", name: "GOLD / BORDO KIRMIZI KADEH", desc: "", price: 320 },
+    { id: "sr4", name: "BORDO KIRMIZI ŞİŞE 75 CL", desc: "", price: 1500 },
+    { id: "sr5", name: "WİNE CREAM", desc: "", price: 1700 },
+    { id: "sr6", name: "GOLD KIRIMIZI", desc: "", price: 1500 },
+    { id: "sr7", name: "BUZBAĞ BEYAZ ŞARAP ŞİŞE", desc: "", price: 1500 },
+    { id: "sr8", name: "BUZBAĞ BEYAZ KADEH", desc: "", price: 320 }
+  ]},
+  { cat: "Cinler", items: [
+    { id: "c1", name: "BİCKENS", desc: "", price: 225 },
+    { id: "c2", name: "GORDON", desc: "", price: 285 },
+    { id: "c3", name: "BOMBAY SAPPHIRE", desc: "", price: 420 },
+    { id: "c4", name: "GORDONS PINK", desc: "", price: 320 },
+    { id: "c5", name: "TANQUERAY", desc: "", price: 440 },
+    { id: "c6", name: "TANQUERAY SEVILLA", desc: "", price: 500 },
+    { id: "c7", name: "TANQUERAY NO 10", desc: "", price: 520 },
+    { id: "c8", name: "ROKU", desc: "", price: 500 },
+    { id: "c9", name: "KNUT HANSEN", desc: "", price: 600 },
+    { id: "c10", name: "GREEN BABOON", desc: "", price: 600 },
+    { id: "c11", name: "GORDONS SICILLIAN LEMON 6CL", desc: "", price: 300 },
+    { id: "c12", name: "HENDRICK`S", desc: "", price: 550 },
+    { id: "c13", name: "SIPSMITH", desc: "", price: 655 },
+    { id: "c14", name: "LARIOS PREMIUM 12", desc: "", price: 250 },
+    { id: "c15", name: "LARIOS PINK", desc: "", price: 250 },
+    { id: "c16", name: "LARIOS", desc: "", price: 250 }
+  ]},
+  { cat: "Votkalar", items: [
+    { id: "v1", name: "SMIRNOFF", desc: "", price: 350 },
+    { id: "v2", name: "SMIRNOFF NORTH", desc: "", price: 275 },
+    { id: "v3", name: "ROYAL BISON", desc: "", price: 750 },
+    { id: "v4", name: "BELVEDERE", desc: "", price: 650 },
+    { id: "v5", name: "KETEL ONE 5 CL", desc: "", price: 500 },
+    { id: "v6", name: "Finlandia 5 CL", desc: "", price: 250 },
+    { id: "v7", name: "HAKU", desc: "", price: 750 },
+    { id: "v8", name: "FINLANDIA BERRY", desc: "", price: 250 },
+    { id: "v9", name: "FINLANDIA LIME", desc: "", price: 250 }
+  ]},
+  { cat: "Viskiler", items: [
+    { id: "vk1", name: "Jameson ( 5 cl)", desc: "", price: 280 },
+    { id: "vk2", name: "JW BLACK LABEL", desc: "", price: 320 },
+    { id: "vk3", name: "JW GOLD LABEL", desc: "", price: 430 },
+    { id: "vk4", name: "JW DOUBLE BLACK", desc: "", price: 520 },
+    { id: "vk5", name: "AUCHENTOSAN", desc: "", price: 295 },
+    { id: "vk6", name: "SİNGLETON 12 YRS", desc: "", price: 310 },
+    { id: "vk7", name: "TALISKER", desc: "", price: 650 },
+    { id: "vk8", name: "LAGAVULIN 8YRS", desc: "", price: 650 },
+    { id: "vk9", name: "HIBIKI", desc: "", price: 1800 },
+    { id: "vk10", name: "DIMPLE", desc: "", price: 350 },
+    { id: "vk11", name: "JIM BEAM APPLE", desc: "", price: 305 },
+    { id: "vk12", name: "JIM BEAM HONEY", desc: "", price: 305 },
+    { id: "vk13", name: "HYDE NO 5", desc: "", price: 420 },
+    { id: "vk14", name: "JIM BEAM RED STAG", desc: "", price: 305 },
+    { id: "vk15", name: "HYDE NO 8", desc: "", price: 420 },
+    { id: "vk16", name: "CARDHU", desc: "", price: 650 },
+    { id: "vk17", name: "HYDE NO 3", desc: "", price: 420 },
+    { id: "vk18", name: "OBAN", desc: "", price: 475 },
+    { id: "vk19", name: "GLENKINCHIE 12 YRS", desc: "", price: 635 },
+    { id: "vk20", name: "GLENFIDDICH 12 YRS", desc: "", price: 625 },
+    { id: "vk21", name: "DEWARS WHITE LBL", desc: "", price: 260 },
+    { id: "vk22", name: "WHYTE MACKAY", desc: "", price: 250 },
+    { id: "vk23", name: "CARDHU 15 YRS", desc: "", price: 950 },
+    { id: "vk24", name: "BULLEIT BOURBON", desc: "", price: 400 },
+    { id: "vk25", name: "TAMNAVULIN", desc: "", price: 295 },
+    { id: "vk26", name: "BUSHMILLS 5 CL", desc: "", price: 285 },
+    { id: "vk27", name: "GLEN TALLOCH 8 YRS 5 CL", desc: "", price: 265 },
+    { id: "vk28", name: "JW BLACK RUBY 5 CL", desc: "", price: 235 },
+    { id: "vk29", name: "OLD SMUGGLER", desc: "", price: 250 },
+    { id: "vk30", name: "JİM BEAM", desc: "", price: 250 },
+    { id: "vk31", name: "TEACHER 5 CL", desc: "", price: 300 },
+    { id: "vk32", name: "OBAN 11", desc: "", price: 750 },
+    { id: "vk33", name: "JİM BEAM BLACK CHER", desc: "", price: 305 },
+    { id: "vk34", name: "JİM BEAM DOUBLE OAK", desc: "", price: 410 },
+    { id: "vk35", name: "CONNEMARA", desc: "", price: 545 },
+    { id: "vk36", name: "JIM BEAM DOUBLE OAK", desc: "", price: 545 },
+    { id: "vk37", name: "JIM BEAM BLACK 7 YRS", desc: "", price: 410 },
+    { id: "vk38", name: "THE GLENGRANT ARBORALIS", desc: "", price: 525 },
+    { id: "vk39", name: "THE GLENGRANT 10YRS", desc: "", price: 495 },
+    { id: "vk40", name: "THE GLENGRANT 12YRS", desc: "", price: 585 },
+    { id: "vk41", name: "THE GLENGRANT 15YRS", desc: "", price: 940 },
+    { id: "vk42", name: "THE GLENGRANT 18YRS", desc: "", price: 1450 },
+    { id: "vk43", name: "BOWMARE 12", desc: "", price: 785 },
+    { id: "vk44", name: "BOWMARE 15", desc: "", price: 1615 },
+    { id: "vk45", name: "BOWMARE 18", desc: "", price: 3155 },
+    { id: "vk46", name: "AUCHENTOSAN THREE WOOD", desc: "", price: 755 },
+    { id: "vk47", name: "AUCHENTOSAN 12", desc: "", price: 605 },
+    { id: "vk48", name: "AUCHENTOSAN 18", desc: "", price: 1735 },
+    { id: "vk49", name: "LAPHROAIG 10", desc: "", price: 735 },
+    { id: "vk50", name: "MAKER`S MARK", desc: "", price: 525 },
+    { id: "vk51", name: "ARDMORE", desc: "", price: 545 },
+    { id: "vk52", name: "THE CHITA", desc: "", price: 1155 },
+    { id: "vk53", name: "KNOP RYE 7", desc: "", price: 775 },
+    { id: "vk54", name: "KNOP 9", desc: "", price: 695 },
+    { id: "vk55", name: "BASIL HAYDEN", desc: "", price: 545 },
+    { id: "vk56", name: "COURVOISER VS", desc: "", price: 600 },
+    { id: "vk57", name: "COURVOISER VSOP", desc: "", price: 800 }
+  ]},
+  { cat: "Rakı", items: [
+    { id: "r1", name: "ALTIN SERI TEK", desc: "", price: 265 },
+    { id: "r2", name: "ALTIN SERI DUBLE", desc: "", price: 340 }
+  ]},
+  { cat: "Tekila & Rom", items: [
+    { id: "rm1", name: "BACARDI WHITE", desc: "", price: 315 },
+    { id: "rm2", name: "CAP. MORGAN WHITE", desc: "", price: 300 },
+    { id: "rm3", name: "CAP. MORGAN SPICE", desc: "", price: 300 }
+  ]},
+  { cat: "Likörler / Diğer Alkollüler", items: [
+    { id: "l1", name: "APEROL", desc: "", price: 350 },
+    { id: "l2", name: "KAHLUA", desc: "", price: 400 },
+    { id: "l3", name: "BAILEYS", desc: "", price: 300 },
+    { id: "l4", name: "TRIPLE SEC", desc: "", price: 400 },
+    { id: "l5", name: "CAMPARI", desc: "", price: 400 },
+    { id: "l6", name: "CHAMBORD", desc: "", price: 500 },
+    { id: "l7", name: "SHANKYS WHIP", desc: "", price: 300 },
+    { id: "l8", name: "JAGERMEISTER", desc: "", price: 400 },
+    { id: "l9", name: "MARTINI ROSSO 6CL", desc: "", price: 350 },
+    { id: "l10", name: "SIERRA TROPICAL", desc: "", price: 300 },
+    { id: "l11", name: "SMIRNOFF NORTH", desc: "", price: 300 },
+    { id: "l12", name: "JAGERMAISTER COLD BREW", desc: "", price: 400 },
+    { id: "l13", name: "JAGERMAISTER MANIFEST", desc: "", price: 500 },
+    { id: "l14", name: "SENOR TEKILA KADEH", desc: "", price: 380 },
+    { id: "l15", name: "MARTINI BIANCO 6 CL", desc: "", price: 350 },
+    { id: "l16", name: "MARTINI EXTRA DRY 6 CL", desc: "", price: 350 },
+    { id: "l17", name: "MEZCAL ORİGEN 5 CL", desc: "", price: 500 },
+    { id: "l18", name: "MEZCAL JAGUAR 5 CL", desc: "", price: 550 },
+    { id: "l19", name: "MONTELOBOS ENSAMBLE", desc: "", price: 800 },
+    { id: "l20", name: "MONTELOBOS ESPADIN", desc: "", price: 620 },
+    { id: "l21", name: "MALIBU 5 CL", desc: "", price: 300 }
+  ]},
+  { cat: "Soğuk İçecekler", items: [
+    { id: "i1", name: "SU", desc: "", price: 40 },
+    { id: "i2", name: "COLA", desc: "", price: 100 },
+    { id: "i3", name: "SODA", desc: "", price: 75 },
+    { id: "i4", name: "ENERJİ", desc: "", price: 150 },
+    { id: "i5", name: "SPRITE", desc: "", price: 100 },
+    { id: "i6", name: "CHURCHILL", desc: "", price: 110 },
+    { id: "i7", name: "MEYVE SUYU", desc: "", price: 100 },
+    { id: "i8", name: "SOĞUK KAHVE", desc: "", price: 200 },
+    { id: "i9", name: "ALKOLSÜZ MEYVE KOKTEYLİ", desc: "", price: 350 }
+  ]},
+  { cat: "Sıcak İçecekler", items: [
+    { id: "h1", name: "AMERICANO", desc: "", price: 150 },
+    { id: "h2", name: "ESPRESSO", desc: "", price: 125 },
+    { id: "h3", name: "LATTE", desc: "", price: 150 },
+    { id: "h4", name: "CAPPUCINO VANİLYA", desc: "", price: 150 },
+    { id: "h5", name: "CAPPUCCINO", desc: "", price: 150 },
+    { id: "h6", name: "SICAK ÇİKOLATA", desc: "", price: 200 },
+    { id: "h7", name: "TÜRK KAHVESİ", desc: "", price: 150 }
+  ]},
+  { cat: "Biralar", items: [
+    { id: "b1", name: "TUBORG GOLD ŞİŞE 33CL", desc: "", price: 135 },
+    { id: "b2", name: "CARLSBERG ŞİŞE 50CL", desc: "", price: 225 },
+    { id: "b3", name: "TUBORG GOLD ŞİŞE 50CL", desc: "", price: 175 },
+    { id: "b4", name: "TUBORG FILTRESIZ", desc: "", price: 220 },
+    { id: "b5", name: "GUINNESS 44CL", desc: "", price: 450 },
+    { id: "b6", name: "CARLSBERG ŞİŞE 33CL", desc: "", price: 175 },
+    { id: "b7", name: "CARLSBERG LUNA 50CL", desc: "", price: 225 },
+    { id: "b8", name: "1664 BLANC 33CL", desc: "", price: 225 },
+    { id: "b9", name: "FREDERİK INDIA PALE ALE 35CL", desc: "", price: 250 },
+    { id: "b10", name: "FREDERİK BROWN ALE", desc: "", price: 250 },
+    { id: "b11", name: "FREDERİK MARZEN LAGER 35CL", desc: "", price: 250 },
+    { id: "b12", name: "FREDERİK YAKIMA IPA", desc: "", price: 250 },
+    { id: "b13", name: "FREDERİK NEIPA 35CL", desc: "", price: 250 },
+    { id: "b14", name: "FREDERİK WHEAT IPA", desc: "", price: 250 },
+    { id: "b15", name: "FREDERİK TROPİC IPA 35CL", desc: "", price: 250 },
+    { id: "b16", name: "WEIHENSTEPHANER 33CL", desc: "", price: 235 },
+    { id: "b17", name: "WEIHENSTEPHANER VITUS 33CL", desc: "", price: 250 },
+    { id: "b18", name: "SOL CERVEZA", desc: "", price: 250 },
+    { id: "b19", name: "DESPERADOS", desc: "", price: 250 },
+    { id: "b20", name: "FREDERİK LOCAL 35CL", desc: "", price: 250 },
+    { id: "b21", name: "TUBORG ICE", desc: "", price: 175 },
+    { id: "b22", name: "EFES GLUTENSİZ (50CL)", desc: "", price: 450 },
+    { id: "b23", name: "CARLSBERG ELEPHANT", desc: "", price: 350 },
+    { id: "b24", name: "TUBORG SMOOTH 33 CL", desc: "", price: 85 }
+  ]},
+  { cat: "Diğer Hizmetler", items: [
+    { id: "dh1", name: "Porty-Kiralanabilir Powerbank", desc: "", price: 0 },
+    { id: "dh2", name: "UYGULAMAYI İNDİR", desc: "", price: 0 },
+    { id: "dh3", name: "QR KODU TARA", desc: "", price: 0 },
+    { id: "dh4", name: "POWERBANK AL", desc: "", price: 0 },
+    { id: "dh5", name: "KULLAN VE BIRAK", desc: "", price: 0 }
+  ]}
+];
+/* ================================== */
+
+const $ = s => document.querySelector(s);
+const state = { mode:null, ad:"", soyad:"", cart:{}, bill:[] };
+const ALL = MENU.flatMap(c => c.items);
+const money = n => (Math.round(n*100)/100).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₺";
+const LS_ORD = "macsec_demo_orders", LS_PAID = "macsec_demo_paid";
+
+/* güvenli yerel depolama */
+const mem = {};
+const lsGet = k => { try{ return localStorage.getItem(k) }catch(e){ return mem[k]||null } };
+const lsSet = (k,v) => { try{ localStorage.setItem(k,v) }catch(e){ mem[k]=v } };
+
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e }
+function titleCase(s){return s.trim().toLocaleLowerCase("tr").split(/\s+/).map(w=>w.charAt(0).toLocaleUpperCase("tr")+w.slice(1)).join(" ")}
+function toast(msg, ok){const t=$("#toast");t.textContent=msg;t.classList.toggle("ok",!!ok);t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),3200)}
+
+function show(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $("#v-"+id).classList.add("active");
+  $("#bar").classList.toggle("show", id==="menu" && cartCount()>0);
+  if(id!=="bill") $("#billBar").classList.remove("show");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function confirmBox(text, yes){
+  return new Promise(res=>{
+    $("#modalText").textContent=text; $("#mYes").textContent=yes||"EVET";
+    const m=$("#modal"); m.classList.add("show");
+    const done=v=>{m.classList.remove("show");$("#mYes").onclick=$("#mNo").onclick=null;res(v)};
+    $("#mYes").onclick=()=>done(true); $("#mNo").onclick=()=>done(false);
+  });
+}
+
+/* ---------- Sepet ---------- */
+function cartCount(){return Object.values(state.cart).reduce((a,b)=>a+b,0)}
+function cartItems(){return ALL.filter(i=>state.cart[i.id]).map(i=>({urun:i.name,adet:state.cart[i.id],fiyat:i.price}))}
+function cartTotal(){return cartItems().reduce((s,i)=>s+i.adet*i.fiyat,0)}
+
+// --- FAVORİ SİSTEMİ (GLOBAL) ---
+const DEFAULT_FAVS = ["i1", "h7", "i2"]; 
+
+function getFavs() {
+  const stored = localStorage.getItem("user_favs");
+  if (!stored) {
+    localStorage.setItem("user_favs", JSON.stringify(DEFAULT_FAVS));
+    return [...DEFAULT_FAVS];
+  }
+  return JSON.parse(stored);
+}
+
+function toggleFav(id) {
+  let favs = getFavs();
+  if (favs.includes(id)) {
+    favs = favs.filter(fId => fId !== id);
+  } else {
+    favs.push(id);
+  }
+  localStorage.setItem("user_favs", JSON.stringify(favs));
+  renderMenu(); 
+}
+
+function getPreparedMenuData(originalMenuData) {
+  const favIds = getFavs();
+  if (favIds.length === 0) return originalMenuData;
+
+  const favoriteItems = [];
+  originalMenuData.forEach(cat => {
+    cat.items.forEach(item => {
+      if (favIds.includes(item.id)) {
+        favoriteItems.push(item);
+      }
+    });
+  });
+
+  return [
+    { cat: "Sık Kullanılanlar ⭐", items: favoriteItems },
+    ...originalMenuData
+  ];
+}
+
+// --- TEK VE HATASIZ RENDER FONKSİYONU ---
+function renderMenu() {
+  const root = $("#menu"); 
+  root.innerHTML = "";
+  
+  // Menü açık/kapalı durumhafızası (Asla sıfırlanmaz)
+  if (typeof window.menuHafizasi === "undefined") {
+    window.menuHafizasi = { "Sık Kullanılanlar ⭐": true };
+  }
+
+  const preparedData = getPreparedMenuData(MENU);
+  const currentFavs = getFavs();
+
+  preparedData.forEach(c => {
+    if (window.menuHafizasi[c.cat] === undefined) {
+      window.menuHafizasi[c.cat] = (c.cat === "Sık Kullanılanlar ⭐");
+    }
+    
+    const isOpen = window.menuHafizasi[c.cat];
+    const arrow = isOpen ? " ▾" : " ▸";
+    
+    const catDiv = el("div", "cat", c.cat.toUpperCase() + arrow);
+    catDiv.style.cursor = "pointer";
+    
+    const g = el("div", "items");
+    g.style.display = isOpen ? "grid" : "none"; 
+    
+    catDiv.onclick = () => {
+      const willOpen = (g.style.display === "none");
+      g.style.display = willOpen ? "grid" : "none";
+      catDiv.innerText = c.cat.toUpperCase() + (willOpen ? " ▾" : " ▸");
+      window.menuHafizasi[c.cat] = willOpen;
+    };
+    
+    root.appendChild(catDiv);
+    
+    c.items.forEach(i => {
+      const row = el("div", "item"); 
+      row.dataset.id = i.id;
+      
+      const qty = state.cart[i.id] || 0;
+      if (qty > 0) row.classList.add("has");
+
+      // Kalp Butonu
+      const isFav = currentFavs.includes(i.id);
+      const favBtn = el("button", `fav-btn ${isFav ? "active" : ""}`, isFav ? "❤️" : "🤍");
+      favBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleFav(i.id);
+      };
+      row.appendChild(favBtn);
+
+      // Ürün Bilgileri
+      const t = el("div", "t"); 
+      t.appendChild(el("b", null, i.name)); 
+      t.appendChild(el("span", null, i.desc)); 
+      row.appendChild(t);
+      
+      // Fiyat
+      row.appendChild(el("div", "pr", money(i.price)));
+      
+      // Sepet Butonları (+ / -)
+      const q = el("div", "qty");
+      const mi = el("button", "minus", "−");
+      const em = el("em", null, String(qty)); 
+      const pl = el("button", "plus", "+");
+      
+      mi.onclick = () => change(i.id, -1); 
+      pl.onclick = () => change(i.id, 1);
+      
+      q.append(mi, em, pl); 
+      row.appendChild(q); 
+      
+      g.appendChild(row);
+    });
+    
+    root.appendChild(g);
+  });
+}
+
+function change(id,d){
+  const n=Math.max(0,(state.cart[id]||0)+d);
+  if(n===0) delete state.cart[id]; else state.cart[id]=n;
+  const row=document.querySelector(`.item[data-id="${id}"]`);
+  if(row){
+    row.classList.toggle("has",n>0); 
+    row.querySelector("em").textContent=n;
+  }
+  updateBar();
+}
+
+function updateBar(){
+  const n=cartCount();
+  $("#bar").classList.toggle("show",n>0);
+  $("#sum").textContent="";
+  const b=el("b",null,n+" ürün"); $("#sum").appendChild(b); $("#sum").appendChild(document.createElement("br"));
+  $("#sum").appendChild(document.createTextNode(cartItems().map(i=>i.adet+"x "+i.urun).join(", ")));
+  $("#cartTotal").textContent=money(cartTotal());
+}
+
+/* ---------- Veri katmanı (Google Tablolar / demo) ---------- */
+const demoRows = () => JSON.parse(lsGet(LS_ORD)||"[]");
+function aggregate(rows){
+  const map={}, lines=[];
+  rows.forEach(o=>{
+    const k=[o.ad,o.soyad,o.urun,o.fiyat].join("|");
+    if(!map[k]){map[k]={ad:o.ad,soyad:o.soyad,urun:o.urun,adet:0,fiyat:o.fiyat,ids:[]};lines.push(map[k])}
+    map[k].adet+=o.adet; map[k].ids.push(o.id);
+  });
+  return lines;
+}
+async function apiGet(action){
+  const r=await fetch(SCRIPT_URL+"?action="+action+"&_="+Date.now()); const j=await r.json();
+  if(!j.ok) throw new Error(j.error||"İşlem başarısız"); return j;
+}
+async function apiPost(body){
+  const r=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});
+  const j=await r.json(); if(!j.ok) throw new Error(j.error||"İşlem başarısız"); return j;
+}
+async function fetchNames(){
+  if(SCRIPT_URL) return (await apiGet("names")).names;
+  const seen={},out=[];
+  demoRows().filter(r=>r.durum!=="Ödendi").forEach(r=>{const k=r.ad+"|"+r.soyad;if(!seen[k]){seen[k]=1;out.push({ad:r.ad,soyad:r.soyad})}});
+  return out;
+}
+async function fetchBill(){
+  if(SCRIPT_URL) return (await apiGet("bill")).lines;
+  return aggregate(demoRows().filter(r=>r.durum!=="Ödendi"));
+}
+async function postOrder(ad,soyad,items){
+  if(SCRIPT_URL) return apiPost({action:"order",ad,soyad,items});
+  const rows=demoRows(); let id=rows.reduce((m,r)=>Math.max(m,r.id),1);
+  const tarih=new Date().toLocaleString("tr-TR");
+  items.forEach(i=>rows.push({id:++id,ad,soyad,urun:i.urun,adet:i.adet,fiyat:i.fiyat,tarih,durum:"Açık"}));
+  lsSet(LS_ORD,JSON.stringify(rows));
+}
+async function postPay(lines){
+  const payload=lines.map(l=>({ad:l.ad,soyad:l.soyad,urun:l.urun,adet:l.adet,fiyat:l.fiyat,ids:l.ids}));
+  if(SCRIPT_URL) return apiPost({action:"pay",lines:payload});
+  const ids=new Set(payload.flatMap(l=>l.ids));
+  lsSet(LS_ORD,JSON.stringify(demoRows().map(r=>ids.has(r.id)?{...r,durum:"Ödendi"}:r)));
+  const paid=JSON.parse(lsGet(LS_PAID)||"[]");
+  paid.push({tarih:new Date().toLocaleString("tr-TR"),lines:payload.filter(l=>l.adet>0)});
+  lsSet(LS_PAID,JSON.stringify(paid));
+}
+
+/* ---------- Hesap ekranı ---------- */
+/* ---------- Hesap ekranı (Parçalı Ödeme Destekli) ---------- */
+async function reloadBill(){
+  const box=$("#billBox");
+  try{
+    const lines=await fetchBill();
+    // Her satır için o an ödenecek geçici 'payQty' (ödenecek adet) alanını ekliyoruz
+    state.bill=lines.map(l=>({...l, orig:l.adet, payQty:l.adet}));
+    renderBill();
+  }catch(e){
+    box.innerHTML=""; box.appendChild(el("div","empty","Hesap alınamadı: "+e.message)); $("#billBar").classList.remove("show");
+  }
+}
+
+async function openBill(){
+  show("bill"); $("#billBox").innerHTML=""; $("#billBox").appendChild(el("div","empty","Yükleniyor…"));
+  await reloadBill();
+}
+
+function renderBill(){
+  const box=$("#billBox"); box.innerHTML="";
+  if(!state.bill.length){
+    box.appendChild(el("div","empty","Açık hesap yok."));
+    $("#billBar").classList.remove("show"); return;
+  }
+  const groups=new Map();
+  state.bill.forEach((l,i)=>{const k=l.ad+"\n"+l.soyad;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(i)});
+  let grand=0;
+  
+  groups.forEach(idxs=>{
+    const first=state.bill[idxs[0]];
+    // Bu kişinin o an seçili ödeme toplamı
+    const sub=idxs.reduce((s,i)=>s+(state.bill[i].payQty*state.bill[i].fiyat),0); 
+    grand+=sub;
+
+    const card=el("div","glass person");
+    const head=el("div","p-head");
+    head.appendChild(el("h3",null,first.ad+" "+first.soyad));
+    head.appendChild(el("span","sub-t",money(sub)));
+    
+    // Kişinin seçilen miktarlarını ödeme butonu
+    const pb=el("button","btn sm","SEÇİLENİ ÖDE"); 
+    pb.onclick=()=>payPartial(idxs); 
+    head.appendChild(pb);
+    card.appendChild(head);
+
+    idxs.forEach(i=>{
+      const l=state.bill[i];
+      const row=el("div","line"+(l.payQty===0?" zero":""));
+      const nm=el("div","nm"); 
+      nm.appendChild(el("b",null,l.urun));
+      nm.appendChild(el("small",null,`Toplam adet: ${l.orig} | Ödenecek: `));
+      row.appendChild(nm);
+      
+      row.appendChild(el("div","up",money(l.fiyat)+" / adet"));
+      
+      // Adet Seçme Alanı (Bu kalemin kaç adedini ödenecek?)
+      const q=el("div","qty");
+      const mi=el("button",null,"−"), em=el("em",null,String(l.payQty)), pl=el("button","plus","+");
+      
+      mi.onclick=()=>{l.payQty=Math.max(0,l.payQty-1);renderBill()};
+      pl.onclick=()=>{l.payQty=Math.min(l.adet,l.payQty+1);renderBill()};
+      
+      q.append(mi,em,pl); 
+      row.appendChild(q);
+      
+      row.appendChild(el("div","lt",money(l.payQty*l.fiyat)));
+      card.appendChild(row);
+    });
+    box.appendChild(card);
+  });
+  $("#grand").textContent=money(grand);
+  $("#billBar").classList.add("show");
+}
+
+let paying=false;
+async function payPartial(idxs){
+  if(paying) return;
+  const activeLines = idxs.map(i=>state.bill[i]).filter(l=>l.payQty>0);
+  if(!activeLines.length){
+    toast("Lütfen ödenecek bir miktar seçin.");
+    return;
+  }
+
+  const total=activeLines.reduce((s,l)=>s+l.payQty*l.fiyat,0);
+  const names=[...new Set(activeLines.map(l=>l.ad+" "+l.soyad))];
+  const who=names.join(", ");
+
+  const ok=await confirmBox(`${who} için seçilen ${money(total)} tutarındaki hesap ödenip kaydedilsin mi?`,"ÖDENDİ");
+  if(!ok) return;
+
+  paying=true;
+  try{
+    const payload = activeLines.map(l=>({
+      ad: l.ad, soyad: l.soyad, urun: l.urun, adet: l.payQty, fiyat: l.fiyat, ids: l.ids
+    }));
+    
+    await postPay(payload); 
+    toast("Seçilen hesap kaydedildi ✓",true); 
+    await reloadBill();
+  }
+  catch(e){ toast("Kaydedilemedi: "+e.message) }
+  finally{ paying=false }
+}
+
+/* ---------- Olaylar ---------- */
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{
+  if(b.dataset.go==="home"){state.cart={};state.mode=null}
+  show(b.dataset.go);
+});
+$("#b-create").onclick=()=>{state.mode="create";$("#nameErr").textContent="";show("name");setTimeout(()=>$("#ad").focus(),300)};
+$("#b-bill").onclick=openBill;
+$("#payAll").onclick=()=>pay(state.bill.map((_,i)=>i));
+$("#b-add").onclick=async()=>{
+  state.mode="add"; show("pick");
+  const box=$("#names"); box.innerHTML=""; box.appendChild(el("div","empty","Yükleniyor…"));
+  try{
+    const names=await fetchNames(); box.innerHTML="";
+    if(!names.length){box.appendChild(el("div","empty","Açık sipariş yok. Önce “Sipariş Oluştur” ile başlayın."));return}
+    names.forEach(n=>{
+      const b=el("button","name-btn",n.ad+" "+n.soyad);
+      b.onclick=()=>{state.ad=n.ad;state.soyad=n.soyad;openMenu()};
+      box.appendChild(b);
+    });
+  }catch(e){box.innerHTML="";box.appendChild(el("div","empty","Liste alınamadı: "+e.message))}
+};
+$("#nameForm").onsubmit=e=>{
+  e.preventDefault();
+  const ad=titleCase($("#ad").value), soyad=titleCase($("#soyad").value);
+  if(!ad||!soyad){$("#nameErr").textContent="Ad ve soyad zorunlu.";return}
+  state.ad=ad;state.soyad=soyad;openMenu();
+};
+function openMenu(){
+  state.cart={}; renderMenu(); updateBar();
+  $("#whoName").textContent=state.ad+" "+state.soyad;
+  $("#whoTag").textContent=state.mode==="add"?"  ·  EK SİPARİŞ":"";
+  show("menu");
+}
+$("#menuBack").onclick=()=>{state.cart={};show(state.mode==="add"?"pick":"name")};
+
+$("#addCustomBtn").onclick = () => {
+  const nameInp = $("#customName");
+  const priceInp = $("#customPrice");
+  const name = titleCase(nameInp.value);
+  const price = parseFloat(priceInp.value);
+
+  if (!name || isNaN(price) || price <= 0) {
+    toast("Lütfen geçerli bir ürün adı ve fiyat girin.");
+    return;
+  }
+
+  const newId = "c_" + Date.now();
+  const newItem = { id: newId, name: name, desc: "Menü Dışı / Özel", price: price };
+
+  let customCat = MENU.find(c => c.cat === "Özel Siparişler");
+  if (!customCat) {
+    customCat = { cat: "Özel Siparişler", items: [] };
+    MENU.push(customCat);
+  }
+  customCat.items.push(newItem);
+  ALL.push(newItem);
+
+  state.cart[newId] = 1;
+  nameInp.value = "";
+  priceInp.value = "";
+
+  renderMenu();
+  updateBar();
+  toast("Özel ürün eklendi ✓", true);
+};
+
+$("#send").onclick=async()=>{
+  if(!cartCount())return;
+  const btn=$("#send"); btn.disabled=true; btn.textContent="GÖNDERİLİYOR…";
+  const items=cartItems(), total=cartTotal();
+  try{
+    await postOrder(state.ad,state.soyad,items);
+    $("#doneText").textContent=`${state.ad} ${state.soyad}, siparişin restorana iletildi: ${items.map(i=>i.adet+"x "+i.urun).join(", ")} — ${money(total)}`;
+    state.cart={}; show("done");
+  }catch(e){toast("Gönderilemedi: "+e.message)}
+  finally{btn.disabled=false;btn.textContent="SİPARİŞİ GÖNDER"}
+};
+
+if(!SCRIPT_URL) $("#demoNote").style.display="block";
+</script>
+</body>
+</html>
